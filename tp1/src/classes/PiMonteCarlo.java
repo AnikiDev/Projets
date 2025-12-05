@@ -61,7 +61,7 @@ class PiMonteCarlo {
             // boucle vide : on attend la fin de toutes les exécutions
         }
 
-        // Formule Monte-Carlo pour π : classes.Pi ≈ 4 * (nombre de succès) / (nombre total de tirs)
+        // Formule Monte-Carlo pour π : Pi ≈ 4 * (nombre de succès) / (nombre total de tirs)
         value = 4.0 * nAtomSuccess.get() / nThrows;
 
         return value; // renvoie l'estimation finale de π

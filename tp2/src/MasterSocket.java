@@ -1,5 +1,3 @@
-package classes;
-
 import java.io.*;
 import java.net.*;
 
@@ -92,51 +90,52 @@ public class MasterSocket {
         long stopTime, startTime;
 
         // Boucle principale
-        while (message_repeat.equals("y")){
 
-            startTime = System.currentTimeMillis(); // Chronometric du temps
+        while (message_repeat.equals("y")) {
 
-            // Envoi de l’ordre aux workers : exécute totalCount simulations
-            for(int i = 0 ; i < numWorkers ; i++) {
+            startTime = System.currentTimeMillis();
+
+            total = 0; // ← IMPORTANT : réinitialiser à chaque run
+
+            // Envoi de l’ordre aux workers
+            for (int i = 0; i < numWorkers; i++) {
                 writer[i].println(message_to_send);
             }
 
-            // Lecture des résultats retournés par chaque worker
-            for(int i = 0 ; i < numWorkers ; i++) {
+            // Lecture des résultats
+            for (int i = 0; i < numWorkers; i++) {
                 tab_total_workers[i] = reader[i].readLine();
-                System.out.println("Client sent: " + tab_total_workers[i]);
+                // System.out.println("Client sent: " + tab_total_workers[i]); // OK pour debug
             }
 
-            // Addition des résultats envoyés par les workers
-            for(int i = 0 ; i < numWorkers ; i++) {
+            // Somme des résultats du run courant (sans cumul inter-runs)
+            for (int i = 0; i < numWorkers; i++) {
                 total += Integer.parseInt(tab_total_workers[i]);
             }
 
-            // Calcul final de PI via Monte Carlo (aire estimée)
-            pi = 4.0 * total / totalCount / numWorkers;
+            // Calcul de PI pour CE run uniquement
+            pi = 4.0 * total / (double)(totalCount * numWorkers);
 
             stopTime = System.currentTimeMillis();
 
-            // Affichage des résultats
             System.out.println("\nPi : " + pi );
-            System.out.println("Error: " + (Math.abs((pi - Math.PI)) / Math.PI) +"\n");
-
-            System.out.println("Ntot: " + totalCount*numWorkers);
+            System.out.println("Error: " + (Math.abs((pi - Math.PI)) / Math.PI) + "\n");
+            System.out.println("Ntot: " + (long)totalCount * numWorkers);
             System.out.println("Available processors: " + numWorkers);
             System.out.println("Time Duration (ms): " + (stopTime - startTime) + "\n");
 
-            System.out.println( (Math.abs((pi - Math.PI)) / Math.PI) +" "+ totalCount*numWorkers +" "+ numWorkers +" "+ (stopTime - startTime));
+            System.out.println( (Math.abs((pi - Math.PI)) / Math.PI) +" "+ ((long)totalCount*numWorkers) +" "+ numWorkers +" "+ (stopTime - startTime));
 
-            // Demande si l'utilisateur souhaite recommencer
             System.out.println("\n Repeat computation (y/N): ");
             try{
-                message_repeat = bufferRead.readLine();
+                message_repeat = bufferRead.readLine().trim().toLowerCase();
                 System.out.println(message_repeat);
-            }
-            catch(IOException ioE){
+            } catch(IOException ioE){
                 ioE.printStackTrace();
+                message_repeat = "n";
             }
         }
+
 
         // Envoi du message "END" à chaque worker et fermeture des sockets
         for(int i = 0 ; i < numWorkers ; i++) {

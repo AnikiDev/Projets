@@ -1,5 +1,3 @@
-package classes;
-
 import java.io.*;
 import java.net.*;
 

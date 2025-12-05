@@ -88,7 +88,7 @@ class Master {
         // 5) Affichage des résultats
         // ============================
 
-        System.out.println("\nclasses.Pi : " + pi);
+        System.out.println("\nPi : " + pi);
 
         // Erreur relative entre la valeur calculée et la valeur réelle de π
         System.out.println("Error: " + (Math.abs((pi - Math.PI)) / Math.PI) + "\n");

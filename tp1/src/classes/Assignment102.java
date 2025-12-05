@@ -1,4 +1,4 @@
-package classes;// Estimate the value of classes.Pi using Monte-Carlo Method, using parallel program
+package classes;
 
 public class Assignment102 {
 	public static void main(String[] args) {

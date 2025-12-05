@@ -1,4 +1,4 @@
-package classes;
+package classe2;
 
 import java.util.Random;
 import java.util.concurrent.Callable;
@@ -8,9 +8,9 @@ import java.util.concurrent.Callable;
  * Cette tâche génère numIterations points aléatoires
  * et compte combien tombent dans le quart de cercle unité.
  */
-class Worker implements Callable<Long> {
+public class Worker implements Callable<Long> {
 
-    private int numIterations; // nombre de points à simuler
+    private final int numIterations; // nombre de points à simuler
 
     public Worker(int num) {
         this.numIterations = num;

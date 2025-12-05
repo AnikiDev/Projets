@@ -18,12 +18,14 @@ public class MasterSocket {
     static String[] tab_total_workers = new String[maxServer];
 
     // Adresse IP des workers (ici local)
-    static final String ip = "127.0.0.1";
+    static final String ip = "192.168.24.32";
 
     // Tableaux pour les flux de communication
     static BufferedReader[] reader = new BufferedReader[maxServer]; // liste où on va lire ce que le client reçoit
     static PrintWriter[] writer = new PrintWriter[maxServer]; // permet au client d'écrire et de répondre aux serveurs
     static Socket[] sockets = new Socket[maxServer];
+    static int[] user_ports = new int[maxServer];
+
 
 
     public static void main(String[] args) throws Exception {
@@ -54,22 +56,24 @@ public class MasterSocket {
         }
 
         // Demande des ports à utiliser pour chaque worker (même si dans le code ils ne sont pas utilisés)
-        for (int i=0; i<numWorkers; i++){
-            System.out.println("Enter worker"+ i +" port : ");
-            try{
+        for (int i = 0; i < numWorkers; i++) {
+            System.out.println("Enter worker" + i + " port : ");
+            try {
                 s = bufferRead.readLine();
-                System.out.println("You select " + s);
-            }
-            catch(IOException ioE){
+                int port = Integer.parseInt(s.trim());
+                user_ports[i] = port;                   // <-- on mémorise le port choisi
+                System.out.println("You select " + port);
+            } catch (IOException ioE) {
                 ioE.printStackTrace();
             }
         }
+
 
         // Création des sockets pour chaque worker
         for(int i = 0 ; i < numWorkers ; i++) {
 
             // Connexion au worker i sur l'IP et le port correspondants
-            sockets[i] = new Socket(ip, tab_port[i]);
+            sockets[i] = new Socket(ip, user_ports[i]);
             System.out.println("SOCKET = " + sockets[i]);
 
             // Reader pour recevoir les réponses du worker

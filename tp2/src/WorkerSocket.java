@@ -1,6 +1,8 @@
 import java.io.*;
 import java.net.*;
-import test2.*;
+import java.util.concurrent.ExecutionException;
+import test3.*;
+
 
 /**
  * Worker is a server. It computes PI by Monte Carlo method and sends
@@ -59,28 +61,25 @@ public class WorkerSocket {
                 System.out.println("Server receives totalCount = " + str);
 
                 // Conversion de la demande (string -> int)
+                // Conversion de la demande (string -> int)
                 int totalCount = Integer.parseInt(str);
 
                 // -----------------------------
-                //      MONTE CARLO PI
+                // MONTE CARLO PI via Master2
                 // -----------------------------
-                // On estime PI en comptant le nombre de points dans le quart de cercle.
-                // Le Worker renvoie SEULEMENT ce nombre, pas PI.
-                int inside = 0;
-                for (int i = 0; i < totalCount; i++) {
-                    // Tirage aléatoire uniforme entre 0 et 1
-                    double x = Math.random();
-                    double y = Math.random();
+                int numThreads = 10; // ou un paramètre que tu choisis
 
-                    // Vérifie si le point est dans le quart de disque
-                    if (x*x + y*y <= 1.0) {
-                        inside++;
-                    }
+                long inside = 0;
+                try {
+                    inside = new Master3().doRun(totalCount, numThreads);
+                } catch (InterruptedException | ExecutionException e) {
+                    e.printStackTrace();
+                    // En cas d'erreur, tu peux renvoyer 0 ou un code spécial
                 }
-                // -----------------------------
 
                 // Envoie au Master le nombre de points "inside"
                 pWrite.println(inside);
+
 
             } else {
                 // Si le Master envoie "END", on arrête le worker

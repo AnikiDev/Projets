@@ -1,18 +1,17 @@
-package classes;
+package classe2;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.*;
 
-
 /**
- * Classe classes.Master
+ * Classe classe.Master
  * -------------
  * Cette classe gère la création et la coordination de plusieurs threads (workers)
  * pour exécuter une simulation Monte Carlo en parallèle.
  * Elle se charge aussi d’agréger les résultats et d’afficher différentes métriques.
  */
-class Master {
+public class Master {
 
     /**
      * Lance une simulation Monte Carlo en utilisant plusieurs workers (threads)
@@ -35,8 +34,8 @@ class Master {
         // ============================
 
         // Liste de tâches de type Callable<Long>
-        // Chaque classes.Worker renverra un nombre (points dans le cercle)
-        List<Callable<Long>> tasks = new ArrayList<Callable<Long>>();
+        // Chaque classe.Worker renverra un nombre (points dans le cercle)
+        List<Callable<Long>> tasks = new ArrayList<>();
 
         for (int i = 0; i < numWorkers; ++i) {
             // Chaque worker reçoit totalCount comme nombre d'essais à réaliser
@@ -87,19 +86,11 @@ class Master {
         // ============================
         // 5) Affichage des résultats
         // ============================
-
         System.out.println("\ntest.Pi : " + pi);
-
-        // Erreur relative entre la valeur calculée et la valeur réelle de π
         System.out.println("Error: " + (Math.abs((pi - Math.PI)) / Math.PI) + "\n");
 
-        // Total d’essais réalisés
         System.out.println("Ntot: " + totalCount * numWorkers);
-
-        // Affiche le nombre de threads utilisés
         System.out.println("Available processors: " + numWorkers);
-
-        // Durée totale d’exécution
         System.out.println("Time Duration (ms): " + (stopTime - startTime) + "\n");
 
         // Ligne supplémentaire compacte (souvent utilisée pour exporter en CSV)

@@ -1,8 +1,8 @@
-// Estimate the value of Pi using Monte-Carlo Method, using parallel program
+package classes;// Estimate the value of classes.Pi using Monte-Carlo Method, using parallel program
 
 public class Assignment102 {
 	public static void main(String[] args) {
-		PiMonteCarlo PiVal = new PiMonteCarlo(100000);
+		PiMonteCarlo PiVal = new PiMonteCarlo(1000000);
 		long startTime = System.currentTimeMillis();
 		double value = PiVal.getPi();
 		long stopTime = System.currentTimeMillis();

@@ -15,8 +15,10 @@ public class Master3 {
      * @return somme des points dans le cercle
      */
     public long doRun(int totalCount, int numWorkers) throws InterruptedException, ExecutionException {
-        // Diviser le travail pour strong scaling
+        System.out.println("[doRun] totalCount=" + totalCount + " numWorkers=" + numWorkers);
+
         int workPerThread = totalCount / numWorkers;
+        System.out.println("[doRun] workPerThread=" + workPerThread);
 
         List<Callable<Long>> tasks = new ArrayList<>();
         for (int i = 0; i < numWorkers; ++i) {
@@ -25,17 +27,15 @@ public class Master3 {
 
         ExecutorService exec = Executors.newFixedThreadPool(numWorkers);
         List<Future<Long>> results = exec.invokeAll(tasks);
+        System.out.println("[doRun] All tasks finished");
 
         long total = 0;
         for (Future<Long> f : results) {
             total += f.get();
         }
 
-        double pi = 4.0 * total / totalCount / numWorkers;
-
-        long stopTime = System.currentTimeMillis();
-
         exec.shutdown();
+        System.out.println("[doRun] total inside=" + total);
         return total;
     }
 }

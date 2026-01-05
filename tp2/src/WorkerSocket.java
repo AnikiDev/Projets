@@ -3,93 +3,66 @@ import java.net.*;
 import java.util.concurrent.ExecutionException;
 import test3.*;
 
-
 /**
- * Worker is a server. It computes PI by Monte Carlo method and sends
- * the result to Master.
- *
- * Le Worker agit comme un serveur : il attend qu’un Master se connecte,
- * reçoit une demande de calcul (un entier = nombre de tirages Monte-Carlo)
- * puis renvoie le résultat au Master.
+ * WorkerSocket agit comme un **serveur**.
+ * Il reçoit des requêtes du Master (nombre de lancers Monte-Carlo)
+ * calcule PI localement et renvoie le résultat au Master.
  */
 public class WorkerSocket {
 
-    // Port d'écoute du worker (modifiable par argument)
-    static int port = 25545; // default port
-
-    // Flag servant à garder le worker actif
-    private static boolean isRunning = true;
+    // Port par défaut si aucun argument n'est fourni
+    static int port = 25545;
 
     /**
-     * compute PI locally by MC and sends the number of points
-     * inside the disk to Master.
+     * Point d'entrée du Worker
      */
     public static void main(String[] args) throws Exception {
 
-        // Si un port est passé en argument, on l'utilise
-        if (!("".equals(args[0]))) port = Integer.parseInt(args[0]);
-        System.out.println(port);
+        // Si un argument est fourni, on l'utilise comme port
+        if (args.length > 0 && !args[0].equals("")) {
+            port = Integer.parseInt(args[0]);
+        }
+        System.out.println("Port du serveur : " + port);
 
-        // Le worker crée un serveur socket pour écouter sur le port choisi
-        ServerSocket s = new ServerSocket(port);
-        System.out.println("Server started on port " + port);
+        // 1. CREATION DU SERVEUR
+        ServerSocket server = new ServerSocket(port);
+        System.out.println("Worker démarré sur le port " + port);
 
-        // Le worker attend qu'un Master se connecte
-        Socket soc = s.accept();
+        // 🔥 Le worker reste toujours actif
+        while (true) {
 
-        // Reader pour recevoir les messages du Master
-        BufferedReader bRead = new BufferedReader(
-                new InputStreamReader(soc.getInputStream()));
+            // 2. ATTENTE D'UN MASTER
+            Socket soc = server.accept();
+            System.out.println("Master connecté : " + soc);
 
-        // Writer pour envoyer les messages au Master
-        PrintWriter pWrite = new PrintWriter(
-                new BufferedWriter(
-                        new OutputStreamWriter(soc.getOutputStream())), true);
+            BufferedReader bRead = new BufferedReader(new InputStreamReader(soc.getInputStream()));
+            PrintWriter pWrite = new PrintWriter(new BufferedWriter(new OutputStreamWriter(soc.getOutputStream())), true);
 
-        String str;
+            String msg;
 
-        // Boucle principale : le worker attend des instructions du Master
-        while (isRunning) {
+            // 3. BOUCLE DE COMMUNICATION AVEC CE MASTER
+            while ((msg = bRead.readLine()) != null) {
 
-            // Lecture du message envoyé par le Master
-            str = bRead.readLine();
-
-            // Si le Master ne demande pas d'arrêter
-            if (!(str.equals("END"))) {
-
-                // Affiche le nombre de simulations à effectuer
-                System.out.println("Server receives totalCount = " + str);
-
-                // Conversion de la demande (string -> int)
-                // Conversion de la demande (string -> int)
-                int totalCount = Integer.parseInt(str);
-
-                // -----------------------------
-                // MONTE CARLO PI via Master2
-                // -----------------------------
-                int numThreads = 10; // ou un paramètre que tu choisis
-
-                long inside = 0;
-                try {
-                    inside = new Master3().doRun(totalCount, numThreads);
-                } catch (InterruptedException | ExecutionException e) {
-                    e.printStackTrace();
-                    // En cas d'erreur, tu peux renvoyer 0 ou un code spécial
+                if (msg.equals("END")) {
+                    System.out.println("Master a terminé, fermeture de la connexion.");
+                    break; // On ferme juste la connexion, pas le serveur
                 }
 
-                // Envoie au Master le nombre de points "inside"
+                int totalCount = Integer.parseInt(msg);
+                System.out.println("Reçu totalCount = " + totalCount);
+
+                long inside = new Master3().doRun(totalCount, 1);
+
+                // Renvoi du résultat
                 pWrite.println(inside);
-
-
-            } else {
-                // Si le Master envoie "END", on arrête le worker
-                isRunning = false;
             }
+
+            // 4. FERMETURE DE LA CONNEXION AVEC CE MASTER
+            soc.close();
+            System.out.println("Connexion fermée. Worker prêt pour un nouveau master.");
         }
 
-        // Fermeture des flux et socket
-        bRead.close();
-        pWrite.close();
-        soc.close();
+        // ⚠ Ce code ne sera jamais atteint, mais on le laisse pour la forme
+        // server.close();
     }
 }
